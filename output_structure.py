@@ -1,3 +1,5 @@
+# output_structure.py
+
 import os
 import json
 from typing import Optional, List
@@ -8,24 +10,20 @@ import instructor
 import anthropic
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
-# Define the Enum for Seniority Level
 class SeniorityLevel(str, Enum):
     junior = "Junior"
     mid = "Mid"
     senior = "Senior"
     lead = "Lead"
 
-# Define the WorkExperience model
 class WorkExperience(BaseModel):
     company_name: str = Field(..., description="Name of the company")
     position: str = Field(..., description="Position or title held at the company")
     duration_years: int = Field(..., description="Duration of employment in years")
     achievements: List[str] = Field(..., description="Key achievements in this role")
 
-# Define the main Resume model
 class Resume(BaseModel):
     name: str = Field(..., description="Full name of the individual")
     title: str = Field(..., description="Title of the individual")
@@ -48,7 +46,6 @@ class Resume(BaseModel):
         with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(self.model_dump(), f, indent=4, ensure_ascii=False)
 
-# Function to read and extract text from a PDF file
 def read_pdf(file_path: str) -> str:
     pdf_document = fitz.open(file_path)
     all_text = ""
@@ -58,7 +55,6 @@ def read_pdf(file_path: str) -> str:
         all_text += f"\n{text}"
     return all_text
 
-# Function to process the resume using an LLM and extract structured data
 def process_resume(resume_path: str) -> Optional[Resume]:
     api_key = os.getenv('ANTHROPIC_API_KEY')
     resume_text = read_pdf(resume_path)
@@ -85,7 +81,6 @@ def main():
     resume = process_resume('./resume.pdf')
     if resume:
         resume.to_json('./resume.json')
-        print("Resume has been successfully processed and saved as JSON.")
     else:
         print("Failed to process the resume.")
 
